@@ -27,6 +27,9 @@ module.exports = {
           },
           {
             loader: 'less-loader' // less 转换和加载
+          },
+          {
+            loader: 'postcss-loader'
           }
         ]
       },
