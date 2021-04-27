@@ -5,7 +5,11 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OptimizeCssAssetsWebpackPlugin = require('optimize-css-assets-webpack-plugin')
 
+const nodeEnv = process.env.NODE_ENV
+const development = nodeEnv === 'development'
+console.log('--- webpack --- ', nodeEnv)
 module.exports = {
+  mode: development ? 'development' : 'production',
   entry: {
     index: './index.js' // 需要打包的入口文件
   },
@@ -18,8 +22,8 @@ module.exports = {
       {
         test: /\.(less|css)$/,
         use: [
-          { loader: 'style-loader' }, // 用来将css-loader 转换后的结果通过 style 标签追加到页面上 ,
-          // MiniCssExtractPlugin.loader, // css独立打包
+          development ? { loader: 'style-loader' }  // 用来将css-loader 转换后的结果通过 style 标签追加到页面上 ,
+            : MiniCssExtractPlugin.loader, // css独立打包
           {
             loader: 'css-loader', // 将 CSS 模块转换为一个 JS 模块
             options: {
@@ -37,6 +41,9 @@ module.exports = {
     ]
   },
   plugins: [
+    new Webpack.DefinePlugin({
+      MY_ENV: JSON.stringify(development ? 'dev' : 'pro')
+    }),
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: path.resolve(__dirname, '../index.html'),
@@ -49,16 +56,15 @@ module.exports = {
       }
     }),
     new MiniCssExtractPlugin({
-      filename:  '[name].[hash].css' , // 对应entry中的
+      filename: '[name].[hash].css', // 对应entry中的
       chunkFilename: '[id].[hash].css' // 未在entry中，有需要打包出来的，例如分包懒加载
     }),
     new OptimizeCssAssetsWebpackPlugin(), // 压缩css文件
     new Webpack.HotModuleReplacementPlugin(),
     new CleanWebpackPlugin() // 清理构建文件夹
   ],
-  mode: 'development',
   devServer: {
-    contentBase: path.join(__dirname, "../dist/"), // 设置服务器访问的基本目录
+    contentBase: path.join(__dirname, '../dist/'), // 设置服务器访问的基本目录
     host: 'localhost', // host or ip，例如127.0.0.1、0.0.0.0
     port: 8000, // 端口
     compress: true, // gzip
@@ -66,12 +72,12 @@ module.exports = {
     open: true, // 自动打开页面
     overlay: true, // 错误显示方式
     proxy: {
-      "/comments": {
-        target: "https://m.weibo.cn",
+      '/comments': {
+        target: 'https://m.weibo.cn',
         changeOrigin: true,
-        logLevel: "debug",
+        logLevel: 'debug',
         headers: {
-          Cookie: ""
+          Cookie: ''
         }
       }
     },
