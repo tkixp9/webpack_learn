@@ -1,4 +1,5 @@
 const path = require('path') // 调用node.js中的路径
+const Webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
@@ -17,8 +18,8 @@ module.exports = {
       {
         test: /\.(less|css)$/,
         use: [
-          // { loader: 'style-loader' // 用来将css-loader 转换后的结果通过 style 标签追加到页面上 },
-          MiniCssExtractPlugin.loader, // css独立打包
+          { loader: 'style-loader' }, // 用来将css-loader 转换后的结果通过 style 标签追加到页面上 ,
+          // MiniCssExtractPlugin.loader, // css独立打包
           {
             loader: 'css-loader', // 将 CSS 模块转换为一个 JS 模块
             options: {
@@ -52,7 +53,28 @@ module.exports = {
       chunkFilename: '[id].[hash].css' // 未在entry中，有需要打包出来的，例如分包懒加载
     }),
     new OptimizeCssAssetsWebpackPlugin(), // 压缩css文件
+    new Webpack.HotModuleReplacementPlugin(),
     new CleanWebpackPlugin() // 清理构建文件夹
   ],
-  mode: 'development'    // 开发模式
+  mode: 'development',
+  devServer: {
+    contentBase: path.join(__dirname, "../dist/"), // 设置服务器访问的基本目录
+    host: 'localhost', // host or ip，例如127.0.0.1、0.0.0.0
+    port: 8000, // 端口
+    compress: true, // gzip
+    hot: true, // 热更新
+    open: true, // 自动打开页面
+    overlay: true, // 错误显示方式
+    proxy: {
+      "/comments": {
+        target: "https://m.weibo.cn",
+        changeOrigin: true,
+        logLevel: "debug",
+        headers: {
+          Cookie: ""
+        }
+      }
+    },
+    historyApiFallback: true //  支持单页面的路由访问,也可以设置重定向的配置
+  }
 }

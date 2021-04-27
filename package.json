@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev1": "webpack-dev-server --env development --config config/webpack.config.js",
+    "dev": "webpack serve --env development --config config/webpack.config.js",
     "build": "webpack --config config/webpack.config.js"
   },
   "author": "",
@@ -21,12 +23,7 @@
     "postcss-loader": "^5.2.0",
     "style-loader": "^2.0.0",
     "webpack": "^5.35.1",
-    "webpack-cli": "^4.6.0"
-  },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ]
+    "webpack-cli": "^4.6.0",
+    "webpack-dev-server": "^3.11.2"
+  }
 }
