@@ -17,8 +17,26 @@ module.exports = {
     filename: '[name]-[chunkhash:5].js',    // 输入的文件名是什么，生成的文件名也是什么
     path: path.resolve(__dirname, '../dist') // 指定生成的文件目录
   },
+  target: development ? 'web' : ['web', 'es5'], // 开发模式时，注意不影响热更新
   module: {
     rules: [
+      {
+        test: /\.js$/, // 匹配所有 js 文件
+        exclude: /node_modules/,
+        loader: 'babel-loader', // 使用 babel-loader 处理 js 文件
+        options: {
+          presets: [
+            [
+              '@babel/preset-env',
+              {
+                // 需要兼容到以下浏览器的什么版本
+                targets: { ie: 7, edge: '17', firefox: '60', chrome: '67', safari: '11.1' }
+              }
+            ]
+          ],
+          plugins :['@babel/transform-runtime']
+        }
+      },
       {
         test: /\.(less|css)$/,
         use: [
@@ -38,6 +56,13 @@ module.exports = {
           }
         ]
       },
+      {
+        test: /\.(png|svg|jpg|jpeg|gif)$/,
+        loader: 'url-loader',
+        options: {
+          limit: 10000 // 大小限制
+        }
+      }
     ]
   },
   plugins: [
@@ -72,8 +97,8 @@ module.exports = {
     open: true, // 自动打开页面
     overlay: true, // 错误显示方式
     proxy: {
-      '/comments': {
-        target: 'https://m.weibo.cn',
+      '/users': {
+        target: 'https://api.github.com',
         changeOrigin: true,
         logLevel: 'debug',
         headers: {
